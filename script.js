@@ -1,54 +1,77 @@
-// 🔁 GANTI URL INI dengan URL CSV dari Google Sheets Anda
-const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3B_3bz96kPXSafKlnY70baWV9cNjGDlR3Se7FgW_P8Hm_XKdsddjsWNx_WCDqYAmUf4gcAnMpPRhz/pub?gid=0&single=true&output=csv"; 
+// 🔁 GANTI URL INI dengan link CSV dari Google Sheets Anda
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3B_3bz96kPXSafKlnY70baWV9cNjGDlR3Se7FgW_P8Hm_XKdsddjsWNx_WCDqYAmUf4gcAnMpPRhz/pub?gid=0&single=true&output=csv";
 
-let barangData = [];       // menyimpan array {nama, kategori, harga}
+let barangData = [];
 let chartInstance = null;
 
-// Format Rupiah
 function formatRp(angka) {
     return "Rp " + new Intl.NumberFormat("id-ID").format(angka);
 }
 
-// Ambil data dari Google Sheets
 async function loadData() {
+    const tableBody = document.getElementById("tableBody");
+    const statsDiv = document.getElementById("stats");
+    
     try {
+        statsDiv.innerHTML = "⏳ Mengambil data dari Google Sheets...";
+        
         const response = await fetch(SHEET_CSV_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: Gagal ambil data`);
+        
         const csvText = await response.text();
+        console.log("CSV mentah (200 karakter pertama):", csvText.substring(0, 200));
         
-        // Parse CSV sederhana
-        const rows = csvText.trim().split("\n");
-        const headers = rows[0].toLowerCase().split(",");
-        const namaIndex = headers.findIndex(h => h.includes("nama") || h.includes("barang"));
-        const kategoriIndex = headers.findIndex(h => h.includes("kategori"));
-        const hargaIndex = headers.findIndex(h => h.includes("harga"));
+        // Parse CSV sederhana (toleransi kutip)
+        const rows = csvText.trim().split(/\r?\n/);
+        if (rows.length < 2) throw new Error("File CSV hanya berisi header atau kosong");
         
-        if (namaIndex === -1 || hargaIndex === -1) {
-            throw new Error("Kolom 'nama_barang' atau 'harga' tidak ditemukan");
-        }
+        const headers = rows[0].split(",").map(h => h.trim().toLowerCase());
+        console.log("Header terdeteksi:", headers);
+        
+        // Cari kolom yang paling mungkin
+        let namaIndex = headers.findIndex(h => h.includes("nama") || h.includes("barang") || h === "produk");
+        let kategoriIndex = headers.findIndex(h => h.includes("kategori") || h === "jenis" || h === "group");
+        let hargaIndex = headers.findIndex(h => h.includes("harga") || h === "price" || h === "rp");
+        
+        // Jika tidak ditemukan, asumsikan urutan: nama, kategori, harga
+        if (namaIndex === -1) namaIndex = 0;
+        if (kategoriIndex === -1) kategoriIndex = 1;
+        if (hargaIndex === -1) hargaIndex = 2;
+        
+        if (hargaIndex === -1) throw new Error("Tidak bisa menemukan kolom harga");
         
         barangData = [];
         for (let i = 1; i < rows.length; i++) {
-            const cols = rows[i].split(",");
-            if (cols.length < 3) continue;
-            const nama = cols[namaIndex]?.trim();
-            const kategori = (kategoriIndex !== -1 ? cols[kategoriIndex]?.trim() : "Lainnya") || "Lainnya";
+            // Parse sederhana, abaikan kutip kompleks (asumsi tidak ada koma di dalam nilai)
+            let cols = rows[i].split(",");
+            if (cols.length <= Math.max(namaIndex, kategoriIndex, hargaIndex)) continue;
+            
+            let nama = cols[namaIndex]?.trim() || "Tanpa nama";
+            let kategori = (kategoriIndex !== -1 && cols[kategoriIndex]) ? cols[kategoriIndex].trim() : "Lainnya";
             let harga = parseInt(cols[hargaIndex]?.trim());
-            if (isNaN(harga)) continue;
+            if (isNaN(harga)) continue; // skip baris harga tidak valid
             
             barangData.push({ nama, kategori, harga });
         }
         
-        // Update UI
+        if (barangData.length === 0) throw new Error("Tidak ada data barang yang valid (periksa kolom harga)");
+        
+        // Sukses
         updateCategoryFilter();
         applyFiltersAndRender();
+        statsDiv.innerHTML = "✅ Data berhasil dimuat (" + barangData.length + " barang)";
+        
     } catch (error) {
         console.error(error);
-        document.getElementById("tableBody").innerHTML = `<tr><td colspan="3">❌ Gagal memuat data. Cek URL Google Sheet.</td></tr>`;
-        document.getElementById("stats").innerHTML = "❌ Error: " + error.message;
+        tableBody.innerHTML = `<tr><td colspan="3">❌ Error: ${error.message}<br><br>Pastikan:
+        <ul><li>Link CSV benar dan dipublikasikan</li>
+        <li>Kolom sheet berisi: nama_barang, kategori, harga (atau nama lain yang mirip)</li>
+        <li>Tidak ada baris kosong di awal sheet</li></ul>
+        Cek konsol browser untuk detail.</td></tr>`;
+        statsDiv.innerHTML = "❌ Gagal memuat data: " + error.message;
     }
 }
 
-// Isi dropdown kategori unik
 function updateCategoryFilter() {
     const kategoriSet = new Set(barangData.map(item => item.kategori));
     const select = document.getElementById("categoryFilter");
@@ -58,7 +81,6 @@ function updateCategoryFilter() {
     });
 }
 
-// Filter data berdasarkan search, harga, kategori
 function getFilteredData() {
     const search = document.getElementById("search").value.toLowerCase();
     const min = parseInt(document.getElementById("minPrice").value) || 0;
@@ -73,7 +95,6 @@ function getFilteredData() {
     });
 }
 
-// Tampilkan statistik dan tabel
 function updateStatsAndTable(filtered) {
     if (!filtered.length) {
         document.getElementById("stats").innerHTML = "⚠️ Tidak ada barang dengan filter ini";
@@ -93,7 +114,6 @@ function updateStatsAndTable(filtered) {
         <span>📊 Rata-rata: ${formatRp(Math.round(rata))}</span>
     `;
     
-    // Tabel
     let html = "";
     filtered.forEach(item => {
         html += `<tr>
@@ -105,12 +125,10 @@ function updateStatsAndTable(filtered) {
     document.getElementById("tableBody").innerHTML = html;
 }
 
-// Grafik: rata-rata harga per kategori (dari data yg sudah difilter)
 function updateChart(filtered) {
     const ctx = document.getElementById("priceChart").getContext("2d");
     if (chartInstance) chartInstance.destroy();
     
-    // Kelompokkan per kategori dari filtered
     const mapKategori = new Map();
     filtered.forEach(item => {
         if (!mapKategori.has(item.kategori)) mapKategori.set(item.kategori, []);
@@ -148,14 +166,12 @@ function updateChart(filtered) {
     });
 }
 
-// Gabungkan semua update
 function applyFiltersAndRender() {
     const filtered = getFilteredData();
     updateStatsAndTable(filtered);
     updateChart(filtered);
 }
 
-// Event listeners
 function bindEvents() {
     document.getElementById("search").addEventListener("input", applyFiltersAndRender);
     document.getElementById("minPrice").addEventListener("input", applyFiltersAndRender);
@@ -163,6 +179,6 @@ function bindEvents() {
     document.getElementById("categoryFilter").addEventListener("change", applyFiltersAndRender);
 }
 
-// Mulai
+// Jalankan
 loadData();
 bindEvents();
