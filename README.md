@@ -49,27 +49,6 @@ Buat spreadsheet dengan kolom:
 
 - Klik ikon ☀️/🌙 di pojok kanan atas
 
-## 📁 Struktur File
-warung-pintar/
-├── index.html
-├── manifest.json
-├── sw.js
-├── css/style.css
-├── js/
-│   ├── app.js
-│   ├── db.js
-│   ├── spreadsheet.js
-│   ├── kasir.js
-│   ├── theme.js
-│   └── utils.js
-├── pages/
-│   ├── home.html
-│   ├── kasir.html
-│   ├── history.html
-│   ├── setting.html
-│   └── produk.html
-└── assets/icons/
-
 
 ## 🔧 Teknologi
 
