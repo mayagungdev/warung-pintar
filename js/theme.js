@@ -1,5 +1,6 @@
 let isDark = localStorage.getItem("theme") === "dark";
 let particleEnabled = true;
+let particleCanvas, ctx, animationId;
 
 function applyTheme() {
     if (isDark) {
@@ -19,28 +20,48 @@ function toggleTheme() {
     applyTheme();
 }
 
-let particleCanvas, ctx, animationId;
+function stopAnimation() {
+    if (animationId) cancelAnimationFrame(animationId);
+    if (particleCanvas) particleCanvas.remove();
+}
+
+function resizeCanvas() {
+    if (particleCanvas) {
+        particleCanvas.width = window.innerWidth;
+        particleCanvas.height = window.innerHeight;
+    }
+}
+
 function startFireflyAnimation() {
     stopAnimation();
     particleCanvas = document.createElement("canvas");
     particleCanvas.id = "particleCanvas";
+    particleCanvas.style.position = "fixed";
+    particleCanvas.style.top = "0";
+    particleCanvas.style.left = "0";
+    particleCanvas.style.width = "100%";
+    particleCanvas.style.height = "100%";
+    particleCanvas.style.pointerEvents = "none";
+    particleCanvas.style.zIndex = "0";
     document.body.appendChild(particleCanvas);
     ctx = particleCanvas.getContext("2d");
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
+    
     let particles = [];
-    for (let i = 0; i < 30; i++) {
+    const count = Math.min(40, Math.floor(window.innerWidth / 40));
+    for (let i = 0; i < count; i++) {
         particles.push({
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
             radius: Math.random() * 3 + 1,
             alpha: Math.random() * 0.5 + 0.2,
-            speedX: (Math.random() - 0.5) * 0.5,
-            speedY: (Math.random() - 0.5) * 0.5
+            speedX: (Math.random() - 0.5) * 0.4,
+            speedY: (Math.random() - 0.5) * 0.4
         });
     }
     function animate() {
-        if (!particleCanvas) return;
+        if (!particleCanvas || !ctx) return;
         ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
         for (let p of particles) {
             p.x += p.speedX;
@@ -63,45 +84,42 @@ function startCloudAnimation() {
     stopAnimation();
     particleCanvas = document.createElement("canvas");
     particleCanvas.id = "particleCanvas";
+    particleCanvas.style.position = "fixed";
+    particleCanvas.style.top = "0";
+    particleCanvas.style.left = "0";
+    particleCanvas.style.width = "100%";
+    particleCanvas.style.height = "100%";
+    particleCanvas.style.pointerEvents = "none";
+    particleCanvas.style.zIndex = "0";
     document.body.appendChild(particleCanvas);
     ctx = particleCanvas.getContext("2d");
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
+    
     let clouds = [];
-    for (let i = 0; i < 8; i++) {
+    const count = Math.min(12, Math.floor(window.innerWidth / 100));
+    for (let i = 0; i < count; i++) {
         clouds.push({
             x: Math.random() * window.innerWidth,
             y: Math.random() * (window.innerHeight / 2),
-            radius: Math.random() * 40 + 20,
-            speed: Math.random() * 0.3 + 0.1
+            radius: Math.random() * 50 + 30,
+            speed: Math.random() * 0.2 + 0.05
         });
     }
     function animate() {
-        if (!particleCanvas) return;
+        if (!particleCanvas || !ctx) return;
         ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
         for (let c of clouds) {
             c.x += c.speed;
             if (c.x > particleCanvas.width + c.radius) c.x = -c.radius;
             ctx.beginPath();
             ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
             ctx.fill();
         }
         animationId = requestAnimationFrame(animate);
     }
     animate();
-}
-
-function stopAnimation() {
-    if (animationId) cancelAnimationFrame(animationId);
-    if (particleCanvas) particleCanvas.remove();
-}
-
-function resizeCanvas() {
-    if (particleCanvas) {
-        particleCanvas.width = window.innerWidth;
-        particleCanvas.height = window.innerHeight;
-    }
 }
 
 // Inisialisasi
