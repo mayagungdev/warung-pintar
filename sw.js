@@ -1,4 +1,4 @@
-const CACHE_NAME = "warung-v1";
+const CACHE_NAME = "warung-v2";
 const urlsToCache = [
   "/",
   "/index.html",
@@ -7,7 +7,7 @@ const urlsToCache = [
   "/js/db.js",
   "/js/spreadsheet.js",
   "/js/kasir.js",
-  "/js/theme.js",
+  "/js/backup.js",
   "/js/utils.js"
 ];
 
