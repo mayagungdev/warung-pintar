@@ -1,5 +1,5 @@
 const DB_NAME = "WarungPintarDB";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let db = null;
 
 function openDB() {
@@ -28,7 +28,6 @@ function openDB() {
     });
 }
 
-// Generic CRUD
 async function getAll(storeName) {
     return new Promise((resolve, reject) => {
         const tx = db.transaction(storeName, "readonly");
@@ -80,5 +79,15 @@ async function getByIndex(storeName, indexName, value) {
     });
 }
 
-// Inisialisasi DB
+async function clearStore(storeName) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        const store = tx.objectStore(storeName);
+        const req = store.clear();
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+    });
+}
+
+// Inisialisasi
 openDB().then(() => console.log("DB ready")).catch(console.error);
