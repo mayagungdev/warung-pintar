@@ -83,4 +83,42 @@ Buat spreadsheet dengan kolom berikut (wajib sesuai):
 - **Backup** : Di menu **Setelan**, klik **Backup Data** → file JSON akan diunduh.
 - **Restore** : Pilih file backup, klik **Restore Data** → semua data akan diganti.
 
-## 📁 Struktur File
+
+## 🔧 Teknologi
+
+- HTML5, CSS3 (minimalis, biru, dark mode)
+- JavaScript ES6+
+- IndexedDB (penyimpanan lokal offline)
+- PWA (Service Worker, manifest)
+- Font Inter
+
+## ❓ FAQ
+
+**Apakah bisa digunakan tanpa internet?**  
+Ya. Setelah data usaha diimpor (butuh internet sekali), semua fitur (kasir, history, backup/restore) berjalan offline.
+
+**Bagaimana update harga dari Google Sheets?**  
+Untuk saat ini, hapus usaha lalu tambah lagi dengan URL yang sama. Nanti bisa ditambahkan tombol "Sinkronkan".
+
+**Apakah bisa cetak nota?**  
+Fitur ini ditunda. Rencana akan ditambahkan di versi mendatang (thermal via window.print atau Bluetooth).
+
+**Data history tersimpan di mana?**  
+Di penyimpanan internal browser (IndexedDB). Backup sangat disarankan sebelum ganti HP.
+
+## 🚀 Rencana Pengembangan ke Depan
+
+- [ ] Tombol sinkronisasi manual dari Google Sheets
+- [ ] Cetak nota thermal & PDF
+- [ ] Stok barang & pengurangan otomatis
+- [ ] Laporan laba/rugi harian
+- [ ] Scan barcode
+
+## 📄 Lisensi
+
+MIT
+
+---
+
+**Dibuat untuk pemilik toko sembako Indonesia. Selamat berjualan!**  
+Jika ada pertanyaan atau permintaan fitur, silakan hubungi pengembang.
