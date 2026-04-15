@@ -1,85 +1,86 @@
-# 🏪 Warung Pintar - Aplikasi Kasir & Manajemen Toko Sembako
+# 🏪 Warung Pintar - Aplikasi Kasir Offline untuk Toko Sembako & Eceran
 
-Aplikasi web progresif (PWA) untuk toko sembako, warung, atau usaha kecil. Mendukung **multi usaha**, **produk eceran**, **kasir dengan nota thermal/PDF**, **history transaksi**, dan **tema dinamis** (gelap dengan kunang-kunang / terang dengan awan bergerak).
+Aplikasi web progresif (PWA) untuk manajemen toko, kasir offline, multi usaha, produk dengan satuan bertingkat (eceran), backup & restore data.  
+**Fokus:** Ringan, minimalis, berorientasi biru, dan dapat diinstall sebagai APK dari browser.
 
 ## ✨ Fitur Utama
 
-- ✅ Multi usaha – kelola beberapa toko dalam satu aplikasi
-- ✅ Data dari Google Sheets – update harga & produk tanpa upload ulang
-- ✅ Kasir cepat – tambah produk, input jumlah (eceran/ non-eceran), hitung otomatis
-- ✅ Cetak nota – thermal (printer 58mm) atau simpan sebagai PDF
-- ✅ History pembelian – lihat riwayat, hapus transaksi
-- ✅ Tema dinamis – dark mode dengan animasi kunang-kunang, light mode dengan awan
-- ✅ PWA – bisa diinstall sebagai APK dari Chrome/Android
+- ✅ **Multi usaha** – Kelola beberapa toko/warung dalam satu aplikasi.
+- ✅ **Kasir offline penuh** – Transaksi tetap berjalan tanpa internet (data disimpan di HP).
+- ✅ **Produk eceran dengan satuan bertingkat** – Contoh: rokok bisa dijual per batang, per 6 batang, per 12 batang dengan harga berbeda.
+- ✅ **Backup & restore data** – Simpan seluruh data (usaha, produk, history) ke file JSON, pulihkan kapan saja.
+- ✅ **Tema gelap/terang** – Mode malam dan siang, tanpa animasi (ringan).
+- ✅ **History transaksi** – Lihat riwayat, hapus jika perlu.
+- ✅ **Desain minimalis biru** – Nyaman di mata, responsif untuk HP dan desktop.
+- ✅ **PWA** – Install sebagai aplikasi dari Chrome/Android.
 
 ## 📱 Demo & Instalasi
 
-1. Buka web Anda (GitHub Pages) di Chrome Android.
+1. Buka web (GitHub Pages) di Chrome Android.
 2. Klik menu tiga titik → **Install app** / **Tambahkan ke layar utama**.
 3. Aplikasi akan terinstall seperti APK.
 
 ## 🛠️ Cara Penggunaan
 
-### 1. Persiapan Google Sheets
+### 1. Persiapan Google Sheets (Sumber Data Produk)
 
-Buat spreadsheet dengan kolom:
-| nama_barang | kategori | harga | ecer |
-|-------------|----------|-------|------|
-| Beras Premium | Sembako | 15000 | tidak |
-| Kopi Bubuk | Kopi | 12000 | ya |
-| Rokok A | Rokok | 25000 | tidak |
+Buat spreadsheet dengan kolom berikut (wajib sesuai):
 
-> Kolom `ecer` diisi `ya` jika produk bisa dijual eceran (desimal).  
-> Publikasikan sheet ke web → format CSV → salin URL.
+| nama_barang | kategori | harga_satuan_dasar | satuan_dasar | ecer | daftar_satuan |
+|-------------|----------|--------------------|--------------|------|----------------|
+| Rokok A | Rokok | 2000 | batang | ya | 6 batang:11000;12 batang:20000 |
+| Beras Premium | Sembako | 15000 | kg | tidak | |
+| Kopi Bubuk | Kopi | 12000 | kg | ya | 250 gram:3500 |
 
-### 2. Menambahkan Usaha di Aplikasi
+**Penjelasan kolom:**
+- `nama_barang` : Nama produk.
+- `kategori` : Kelompok produk (Sembako, Rokok, Kopi, dll).
+- `harga_satuan_dasar` : Harga untuk satuan terkecil (misal per batang, per kg).
+- `satuan_dasar` : Nama satuan dasar (batang, kg, pcs).
+- `ecer` : Isi `ya` jika produk bisa dijual dalam beberapa kemasan. Jika tidak, isi `tidak` atau kosong.
+- `daftar_satuan` : Hanya untuk produk eceran. Format: `nama_satuan:harga;nama_satuan:harga`. Pisahkan dengan titik koma.
 
-- Buka menu **Setelan** → **Tambah Usaha Baru**
-- Masukkan nama warung dan URL CSV
-- Klik simpan, data produk akan otomatis diambil
+> **Contoh:** `6 batang:11000;12 batang:20000` artinya pembeli bisa memilih satuan 6 batang (Rp 11.000) atau 12 batang (Rp 20.000). Satuan dasar (batang) otomatis tersedia.
 
-### 3. Bertransaksi
+### 2. Publikasikan Sheet ke Web
 
-- Buka menu **Kasir**
-- Pilih produk, masukkan jumlah, klik **+**
-- Keranjang akan terisi, klik **Nota Thermal** atau **Simpan PDF**
-- Transaksi tersimpan di **History**
+- Buka Google Sheets di HP/komputer.
+- **File → Share → Publish to web**.
+- Pilih tab yang berisi data → format **CSV** → Publish.
+- Salin URL (contoh: `https://docs.google.com/spreadsheets/d/.../export?format=csv`).
 
-### 4. Ganti Tema
+### 3. Menambahkan Usaha di Aplikasi
 
-- Klik ikon ☀️/🌙 di pojok kanan atas
+- Buka menu **Setelan** → **Tambah Usaha Baru**.
+- Masukkan **Nama Warung** dan **URL CSV**.
+- Klik **Tambah & Import Data** (butuh internet sekali saja).
+- Setelah berhasil, data produk tersimpan offline.
 
+### 4. Memilih Usaha Aktif
 
-## 🔧 Teknologi
+- Di menu **Setelan**, klik **Aktifkan** pada usaha yang ingin digunakan.
+- Nama usaha aktif akan tampil di halaman **Home**.
 
-- HTML5, CSS3 (modern, responsive, dark/light theme)
-- JavaScript (ES6+)
-- IndexedDB (penyimpanan lokal)
-- Chart.js (grafik, opsional)
-- PWA (Service Worker, manifest)
+### 5. Bertransaksi (Kasir)
 
-## 📝 Catatan Pengembangan
+- Buka menu **Kasir**.
+- Cari produk, pilih **satuan** (jika eceran, akan muncul opsi satuan).
+- Masukkan **jumlah** (bisa desimal jika satuan dasar eceran).
+- Klik **+** untuk memasukkan ke keranjang.
+- Ulangi untuk produk lain.
+- Klik **Simpan Transaksi** – transaksi langsung tersimpan ke **History** (tanpa cetak nota).
 
-- Data produk diambil dari Google Sheets setiap kali menambah usaha. Untuk update harga, cukup edit sheet lalu **refresh halaman web**.
-- History disimpan di browser. Jika ganti HP, data tidak ikut. (Fitur backup bisa ditambahkan nanti)
-- Untuk printer thermal, pastikan perangkat mendukung cetak via Bluetooth / USB OTG.
+> **Catatan:** Fitur cetak nota sementara ditunda. Nanti bisa ditambahkan.
 
-## 🧪 Rencana Fitur Mendatang
+### 6. Melihat & Menghapus History
 
-- [ ] Stok barang & pengurangan otomatis
-- [ ] Laporan laba/rugi harian
-- [ ] Scan barcode
-- [ ] Backup & restore data
-- [ ] Diskon & pajak
+- Buka menu **History**.
+- Setiap transaksi menampilkan daftar barang, jumlah, total.
+- Klik **🗑️ Hapus** untuk menghapus satu transaksi.
 
-## 🤝 Kontribusi
+### 7. Backup & Restore Data
 
-Silakan fork repository ini untuk dikembangkan sesuai kebutuhan toko Anda.
+- **Backup** : Di menu **Setelan**, klik **Backup Data** → file JSON akan diunduh.
+- **Restore** : Pilih file backup, klik **Restore Data** → semua data akan diganti.
 
-## 📄 Lisensi
-
-MIT
-
----
-
-**Dibuat dengan ❤️ untuk pemilik toko sembako Indonesia**
+## 📁 Struktur File
